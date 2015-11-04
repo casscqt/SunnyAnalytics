@@ -58,7 +58,9 @@
  	*/
 	+(void)endPage:(NSString*)page;
 
+天天象上团队荣誉出品
+http://www.daydays.com
 
-###欢迎大家 issue
+###欢迎大家 issue 我们
 
 
