@@ -61,6 +61,6 @@
 天天象上团队荣誉出品
 http://www.daydays.com
 
-###欢迎大家 issue 我们
+###欢迎大家[issue](https://github.com/DayDayTeam/JYTAnalytics/issues "天天象上") 我们！！
 
 
