@@ -33,17 +33,33 @@
 }
 
 -(void)initWithReportPolicy:(SAReportPolicy)postPolicy{
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"firstStart"]) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"firstStart"];
-        [[NSUserDefaults standardUserDefaults]synchronize];
-        NSString *firstDate = [[SACommon  shareInstance ]getCurrentDate];
-        
-        [[NSUserDefaults standardUserDefaults] setObject:firstDate forKey:@"firstDate"];
-        [[NSUserDefaults standardUserDefaults]synchronize];
+    
+    switch (postPolicy) {
+        case SABATCH:
+            
+            break;
+            
+        case SAREALTIME:
+            
+            break;
+            
+        case SAEVERYDAY:{
+            if (![[NSUserDefaults standardUserDefaults] boolForKey:@"firstStart"]) {
+                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"firstStart"];
+                [[NSUserDefaults standardUserDefaults]synchronize];
+                NSString *firstDate = [[SACommon  shareInstance ]getCurrentDate];
+                
+                [[NSUserDefaults standardUserDefaults] setObject:firstDate forKey:@"firstDate"];
+                [[NSUserDefaults standardUserDefaults]synchronize];
+            }
+            [self postDataThread];
+        }
+            break;
+            
+        default:
+            break;
     }
     
-    [self postDataThread];
-    //performSelectorInBackground
 //    [self performSelectorInBackground:@selector(combinData) withObject:nil];
 }
 -(void)postData
@@ -89,6 +105,9 @@
     [request  setHTTPBody:body];
     //    [request addValue:@"multipart/form-data" forHTTPHeaderField:@"Content-Type"];
     NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    
+    
+//    [[NSURLSession sharedSession] uploadTaskWithStreamedRequest:request];
     
     [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response,NSData *data,NSError *error){
         
