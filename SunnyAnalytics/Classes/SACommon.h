@@ -42,4 +42,18 @@
  */
 -(NSString*)getCurrentDate;
 
+/**
+ *  获取文件Data
+ *
+ *  @return 返回data数据
+ */
+-(NSData *)getFileData;
+
+/**
+ *  获取本地缓存文件路径
+ *
+ *  @return 路径地址
+ */
+-(NSString *)getFilePath;
+
 @end

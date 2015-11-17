@@ -9,11 +9,9 @@
 #import "SAEventInfo.h"
 #import "SAFileManeger.h"
 #import "SAGzipUtility.h"
+#import "SANetWork.h"
 #import "SACommon.h"
 
-#define BEHAVIOR_PATH @"behaviorInfo.txt"
-#define VIEWINFO_PATH @"eventInfo.gz"
-#define ERROR_PATH @"errorInfo.txt"
 @implementation SAAnalytics
 
 +(SAAnalytics*)shareInstance
@@ -62,77 +60,13 @@
     
 //    [self performSelectorInBackground:@selector(combinData) withObject:nil];
 }
--(void)postData
-{
-//    NSString *fileName = @"hmt";
-//    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
-//    [dic setObject:@"operate" forKey:@"operateType"];
-//    NSArray *arr = @[dic];
-//    
-//    [SAFileManeger writeToFile:arr toPath:VIEWINFO_PATH];
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    //获取真机下的路径
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0];  // Documents
-    //  stringByExpandingTildeInPath 将路径中的代字符扩展成用户主目录（~）或指定用户主目录（~user）
-    [fileManager changeCurrentDirectoryPath:[documentsDirectory stringByExpandingTildeInPath]];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:VIEWINFO_PATH];
-    //  确定需要上传的文件(假设选择本地的文件)
-    NSURL*theurl=[NSURL fileURLWithPath:path];
-    NSData *data = [NSData dataWithContentsOfURL:theurl];
-    NSURL *url = [NSURL URLWithString:[SACommon shareInstance].baseUrl ];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
-    [request setTimeoutInterval:5.0];
-    [request setHTTPMethod:@"POST"];
-    
-    //    [request setHTTPBody:[data base64EncodedDataWithOptions:NSUTF8StringEncoding]];
-    //    [request setValue:@"" forKey:@"Content-Type"];
-    //    [request setValue:@"multipart/form-data" forHTTPHeaderField:@"Content-Type"];
-    
-    
-    NSString *boundary = [NSString stringWithFormat:@"---------------------------14737809831466499882746641449"];
-    NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
-    [request addValue:contentType forHTTPHeaderField: @"Content-Type"];
-    NSMutableData *body = [NSMutableData data];
-    [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
-
-    [body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"uploadLog\"; filename=\"vim_go.gz\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithFormat:@"Content-Type: application/octet-stream\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[NSData dataWithData:data]];
-    [body appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [request  setHTTPBody:body];
-    //    [request addValue:@"multipart/form-data" forHTTPHeaderField:@"Content-Type"];
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    
-    
-//    [[NSURLSession sharedSession] uploadTaskWithStreamedRequest:request];
-    
-    [NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response,NSData *data,NSError *error){
-        
-        NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
-        NSDictionary *result = [unarchiver decodeObjectForKey:@"ret"];
-        NSNumber *ret = [result objectForKey:@"ret"];
-
-        if (ret.integerValue==0&&data) {
-            NSLog(@"发送成功%@",result);
-            [SAFileManeger deleteFile:VIEWINFO_PATH];
-        }
-        else
-        {
-            NSLog(@"发送失败");
-        }
-        
-    }];
-}
 
 -(void)postDataThread{
-    NSData *viewInfoArray = [SAFileManeger readFile:VIEWINFO_PATH];  //页面访问信息
+    NSData *viewInfoArray = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];  //页面访问信息
 //    NSString *eventResponse;
 //    NSString *viewResponse;
 //    NSString *errorResponse;
-    [self postData];
+    [[SANetWork sharedInstance] doGetWork:@"" params:nil];
     if (viewInfoArray) {
 //        [message setObject:@"01" forKey:@"operateType"];
 //        eventResponse = [XHPostData postEventInfo:eventArray withPostMessage:message];
@@ -223,7 +157,7 @@
             userViewInfo.appVersion = [NSString stringWithFormat:@"V%@",[dic objectForKey:@"CFBundleVersion"]];
             userViewInfo.deviceModel = [[SACommon shareInstance] deviceString];
             userViewInfo.appChannelId = [SACommon shareInstance].channelId;
-            NSData *data = [SAFileManeger readFile:VIEWINFO_PATH];
+            NSData *data = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
             data = [SAGzipUtility decompressData:data];
                 
             NSMutableArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -234,7 +168,7 @@
             viewData = [userViewInfo entityToDictionary:userViewInfo];
             
             [arr addObject:viewData];
-            if ([SAFileManeger writeToFile:arr toPath:VIEWINFO_PATH]) {
+            if ([SAFileManeger writeToFile:arr toPath:[[SACommon shareInstance] getFilePath]]) {
                 NSLog(@"写入成功");
             }else{
                 NSLog(@"写入失败");
@@ -242,7 +176,6 @@
         }
     }
 }
-
 
 
 -(NSInteger)caculateTimesBetween:(NSDate*)date1 withDate:(NSDate*)date2

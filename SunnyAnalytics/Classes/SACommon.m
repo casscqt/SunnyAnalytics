@@ -12,6 +12,8 @@
 #import <arpa/inet.h>
 #import <sys/utsname.h>
 
+#define VIEWINFO_PATH @"eventInfo.gz"
+
 @implementation SACommon
 
 +(SACommon*)shareInstance
@@ -145,6 +147,26 @@
     [dateformatter setDateFormat:@"YYYY-MM-dd HH:mm:ss"];
     NSString *locationString=[dateformatter stringFromDate:senddate];
     return locationString;
+}
+
+
+-(NSData *)getFileData{
+       //  确定需要上传的文件(假设选择本地的文件)
+    NSURL*theurl=[NSURL fileURLWithPath:[self getFilePath]];
+    NSData *data = [NSData dataWithContentsOfURL:theurl];
+    return data;
+}
+
+-(NSString *)getFilePath{
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    //获取真机下的路径
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];  // Documents
+    //  stringByExpandingTildeInPath 将路径中的代字符扩展成用户主目录（~）或指定用户主目录（~user）
+    [fileManager changeCurrentDirectoryPath:[documentsDirectory stringByExpandingTildeInPath]];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:VIEWINFO_PATH];
+    return path;
 }
 
 
