@@ -11,7 +11,9 @@
 #import "AFNetworking.h"
 #import "SACommon.h"
 
-#define SERVER_PATH @"http://172.16.30.15:8080/actionDetail/collect.do"
+#define SERVER_PATH @"http://172.16.30.15:8080/actionDetail/"
+
+#define SERVER_OUT_INTERVAL 10   //网络超时时间
 
 @implementation SANetWork
 
@@ -24,12 +26,17 @@
     return netWork;
 }
 
--(void)doGetWork:(NSMutableDictionary *)dic {
+-(void)doGetWork:(NSMutableDictionary *)dic  {
+    
+//    NSString *serverBatchUrl = [SERVER_PATH stringByAppendingString:@"collectBatch.do"];
+    
+    NSString *serverSingleUrl = [SERVER_PATH stringByAppendingString:@"collect.do"];
+    
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
-    [manager.requestSerializer setTimeoutInterval:50];
+    [manager.requestSerializer setTimeoutInterval:SERVER_OUT_INTERVAL];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
 
-    [manager GET:SERVER_PATH parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
+    [manager GET:serverSingleUrl parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
 
     } failure:^(NSURLSessionDataTask *task, NSError *error){
 
