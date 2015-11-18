@@ -22,6 +22,7 @@
 		0E3AB6111BDF6D1500B751A0 /* SAGzipUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E3AB6061BDF6D1500B751A0 /* SAGzipUtility.m */; };
 		0E5DD8791BFAD084007AD1FC /* SANetWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5DD8781BFAD084007AD1FC /* SANetWork.m */; };
 		0EE4170D1BE20A60001069F4 /* SACommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE4170C1BE20A60001069F4 /* SACommon.m */; };
+		E348C9AD2ADDB5BBA62B20A3 /* libPods-SunnyAnalytics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EF576CF830AC4F992CA38E0B /* libPods-SunnyAnalytics.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,9 @@
 		0E5DD8781BFAD084007AD1FC /* SANetWork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SANetWork.m; sourceTree = "<group>"; };
 		0EE4170B1BE20A60001069F4 /* SACommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SACommon.h; sourceTree = "<group>"; };
 		0EE4170C1BE20A60001069F4 /* SACommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SACommon.m; sourceTree = "<group>"; };
+		365BCF2E9935AC717BC191F8 /* Pods-SunnyAnalytics.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SunnyAnalytics.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SunnyAnalytics/Pods-SunnyAnalytics.debug.xcconfig"; sourceTree = "<group>"; };
+		52FA70517745D0A5829288E0 /* Pods-SunnyAnalytics.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SunnyAnalytics.release.xcconfig"; path = "Pods/Target Support Files/Pods-SunnyAnalytics/Pods-SunnyAnalytics.release.xcconfig"; sourceTree = "<group>"; };
+		EF576CF830AC4F992CA38E0B /* libPods-SunnyAnalytics.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-SunnyAnalytics.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +83,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0E2C408F1B62631B00384359 /* libz.tbd in Frameworks */,
+				E348C9AD2ADDB5BBA62B20A3 /* libPods-SunnyAnalytics.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -107,6 +112,8 @@
 				0E2C40541B625FB800384359 /* SunnyAnalyticsTests */,
 				0E2C405F1B625FB800384359 /* SunnyAnalyticsUITests */,
 				0E2C40391B625FB800384359 /* Products */,
+				6D86F561E933701AA8C1438D /* Pods */,
+				598A1F01B0D1810F6DABD6AE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -182,6 +189,23 @@
 			path = Classes;
 			sourceTree = "<group>";
 		};
+		598A1F01B0D1810F6DABD6AE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EF576CF830AC4F992CA38E0B /* libPods-SunnyAnalytics.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		6D86F561E933701AA8C1438D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				365BCF2E9935AC717BC191F8 /* Pods-SunnyAnalytics.debug.xcconfig */,
+				52FA70517745D0A5829288E0 /* Pods-SunnyAnalytics.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -189,9 +213,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0E2C40651B625FB800384359 /* Build configuration list for PBXNativeTarget "SunnyAnalytics" */;
 			buildPhases = (
+				4AED8F0EF16C8BB01A6DC25F /* Check Pods Manifest.lock */,
 				0E2C40341B625FB800384359 /* Sources */,
 				0E2C40351B625FB800384359 /* Frameworks */,
 				0E2C40361B625FB800384359 /* Resources */,
+				774A7B307554DD984C7DBD11 /* Embed Pods Frameworks */,
+				DD7595639603147EE29E07AF /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -306,6 +333,54 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		4AED8F0EF16C8BB01A6DC25F /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		774A7B307554DD984C7DBD11 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SunnyAnalytics/Pods-SunnyAnalytics-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DD7595639603147EE29E07AF /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SunnyAnalytics/Pods-SunnyAnalytics-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0E2C40341B625FB800384359 /* Sources */ = {
@@ -457,6 +532,7 @@
 		};
 		0E2C40661B625FB800384359 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 365BCF2E9935AC717BC191F8 /* Pods-SunnyAnalytics.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SunnyAnalytics/Info.plist;
@@ -468,6 +544,7 @@
 		};
 		0E2C40671B625FB800384359 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 52FA70517745D0A5829288E0 /* Pods-SunnyAnalytics.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = SunnyAnalytics/Info.plist;

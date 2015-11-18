@@ -62,15 +62,14 @@
 }
 
 -(void)postDataThread{
-    NSData *viewInfoArray = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];  //页面访问信息
-//    NSString *eventResponse;
-//    NSString *viewResponse;
-//    NSString *errorResponse;
-    [[SANetWork sharedInstance] doGetWork:@"" params:nil];
-    if (viewInfoArray) {
-//        [message setObject:@"01" forKey:@"operateType"];
-//        eventResponse = [XHPostData postEventInfo:eventArray withPostMessage:message];
-    }
+//    NSMutableDictionary *dic = [NSJSONSerialization JSONObjectWithData:arActions options:NSJSONReadingAllowFragments error:nil];
+    NSData *dataArray = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
+    NSArray *arActions = [NSKeyedUnarchiver unarchiveObjectWithData:dataArray];
+    NSString *strActions = [arActions componentsJoinedByString:@" "];
+    
+    NSMutableDictionary *dicParams = [NSMutableDictionary dictionary];
+    [dicParams setObject:strActions forKey:@"jsonParams"];
+    [[SANetWork sharedInstance] doGetWork:dicParams];
     
 }
 
@@ -158,7 +157,7 @@
             userViewInfo.deviceModel = [[SACommon shareInstance] deviceString];
             userViewInfo.appChannelId = [SACommon shareInstance].channelId;
             NSData *data = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
-            data = [SAGzipUtility decompressData:data];
+//            data = [SAGzipUtility decompressData:data];
                 
             NSMutableArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
             if (!arr) {

@@ -20,6 +20,6 @@
  *  @param url 服务器地址
  *  @param dic 参数
  */
--(void)doGetWork:(NSString *)url params:(NSMutableDictionary *)dic;
+-(void)doGetWork:(NSMutableDictionary *)dic;
 
 @end
