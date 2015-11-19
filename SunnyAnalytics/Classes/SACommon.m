@@ -170,4 +170,14 @@
 }
 
 
+-(NSInteger)caculateTimesBetween:(NSDate*)date1 withDate:(NSDate*)date2
+{
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    unsigned int unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
+    NSDateComponents *d = [cal components:unitFlags fromDate:date1 toDate:date2 options:0];
+    NSInteger sec = [d hour]*3600+[d minute]*60+[d second];
+    return sec;
+}
+
+
 @end

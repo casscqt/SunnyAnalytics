@@ -56,4 +56,14 @@
  */
 -(NSString *)getFilePath;
 
+/**
+ *  计算时间间隔
+ *
+ *  @param date1 时间1
+ *  @param date2 时间2
+ *
+ *  @return 间隔时间
+ */
+-(NSInteger)caculateTimesBetween:(NSDate*)date1 withDate:(NSDate*)date2;
+
 @end

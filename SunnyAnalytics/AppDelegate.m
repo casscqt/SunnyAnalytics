@@ -24,7 +24,7 @@
 
 #pragma mark - 上传统计信息策略
 -(void)pushAnalytics{
-    [SAAnalytics initSAAnalytics:@"" reportPolicy:SAEVERYDAY channelId:nil];
+    [SAAnalytics initSAAnalytics:@"" reportPolicy:SAEVERYDAY channelId:@"AppStore"];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

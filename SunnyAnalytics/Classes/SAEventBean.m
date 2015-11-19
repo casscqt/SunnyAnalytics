@@ -1,16 +1,18 @@
 //
-//  SAEventInfo.m
+//  SAEventBean.m
 //  SunnyAnalytics
 //
-//  Created by jiazhaoyang on 15/7/24.
-//  Copyright (c) 2015年 gitpark. All rights reserved.
+//  Created by jiazhaoyang on 15/11/19.
+//  Copyright © 2015年 gitpark. All rights reserved.
 //
 
-#import "SAEventInfo.h"
+#import "SAEventBean.h"
 #import <objc/runtime.h>
-@implementation SAEventInfo
 
--(NSDictionary*)entityToDictionary:(id)obj
+@implementation SAEventBean
+
+
+-(NSMutableDictionary*)entityToDictionary:(id)obj
 {
     NSMutableDictionary *dic = [NSMutableDictionary dictionary];
     unsigned int propsCount;
@@ -66,5 +68,6 @@
     }
     return [self entityToDictionary:obj];
 }
+
 
 @end

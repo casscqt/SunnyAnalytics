@@ -6,7 +6,7 @@
 //  Copyright (c) 2015年 gitpark. All rights reserved.
 //
 #import "SAAnalytics.h"
-#import "SAEventInfo.h"
+#import "SAEventBean.h"
 #import "SAFileManeger.h"
 #import "SAGzipUtility.h"
 #import "SANetWork.h"
@@ -57,8 +57,6 @@
         default:
             break;
     }
-    
-//    [self performSelectorInBackground:@selector(combinData) withObject:nil];
 }
 
 -(void)postDataThread{
@@ -87,10 +85,28 @@
         [dic setObject:optParams forKey:@"optParams"];
     }
     [dic setObject:[NSDate date] forKey:@"startDate"];
-    //修改过
     NSLog(@"%@",dic);
-    [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveEvent:) withObject:dic];
+    [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveFileEvent:) withObject:dic];
 }
+
++(void)doQuickEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams{
+    NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
+    
+    if (operateType) {
+        [dic setObject:operateType forKey:@"operateType"];
+    }
+    if (objId) {
+        [dic setObject:objId forKey:@"objId"];
+    }
+    if (optParams) {
+        [dic setObject:optParams forKey:@"optParams"];
+    }
+    [dic setObject:[NSDate date] forKey:@"startDate"];
+    NSLog(@"%@",dic);
+    [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveQuickEvent:) withObject:dic];
+}
+
+
 +(void)beginPage:(NSString*)page
 {
     if (![[NSUserDefaults standardUserDefaults] boolForKey:@"startFailed"])
@@ -107,7 +123,7 @@
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
         NSString *stayTimeinteval;
         NSDate *date = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%@startDate",page]];
-        NSInteger intimer = [[SAAnalytics shareInstance] caculateTimesBetween:date withDate:[NSDate date]];
+        NSInteger intimer = [[SACommon shareInstance] caculateTimesBetween:date withDate:[NSDate date]];
         stayTimeinteval = [NSString stringWithFormat:@"%ld",(long)intimer];
             
         if (stayTimeinteval) {
@@ -117,73 +133,87 @@
             [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"FIRST_START"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:[NSString stringWithFormat:@"%@startDate",page]];
-            [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveEvent:) withObject:params];
+            [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveFileEvent:) withObject:params];
         }
     }
 }
 
+-(NSMutableDictionary *)bindEventData:(NSDictionary *)postDic{
+    SAEventBean *eventBean = [[SAEventBean alloc]init];
+    
+    if ([postDic objectForKey:@"operateType"]) {
+        eventBean.uniqueCode = [postDic objectForKey:@"operateType"];
+    }else{
+        eventBean.uniqueCode = @"";
+    }
+    eventBean.source = @"30";
+    eventBean.sourceApp = @"1";
+    eventBean.deviceId = @"123456";
+    eventBean.deviceName = @"ios_sim";
+    eventBean.netType = @"4";
+    eventBean.realTime = [[SACommon shareInstance] getCurrentDate];
+    NSDictionary *dic = [[NSBundle mainBundle] infoDictionary];
+    eventBean.versionCode = [NSString stringWithFormat:@"V%@",[dic objectForKey:@"CFBundleShortVersionString"]];
+    eventBean.sysVersion = [[SACommon shareInstance] deviceString];
+    eventBean.channel = [SACommon shareInstance].channelId;
+    
+    
+    if ([postDic objectForKey:@"optParams"]) {
+        eventBean.stayTime = [postDic objectForKey:@"optParams"];
+    }else{
+        eventBean.stayTime = @"";
+    }
+    if ([postDic objectForKey:@"objId"]) {
+        eventBean.objId = [postDic objectForKey:@"objId"];
+    }else{
+        eventBean.objId = @"";
+    }
+    
+    NSMutableDictionary *viewData = [NSMutableDictionary dictionary];
+    viewData = [eventBean entityToDictionary:eventBean];
+    return viewData;
+}
 
--(void)archiveEvent:(NSDictionary*)postDic{
+/**
+ *  写入文件操作
+ *
+ *  @param postDic 数据集
+ */
+-(void)archiveFileEvent:(NSDictionary*)postDic{
     @synchronized(self)
     {
             if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_START"]) {
-            SAEventInfo *userViewInfo = [[SAEventInfo alloc]init];
-            
-            userViewInfo.userName = [[NSUserDefaults standardUserDefaults] objectForKey:@"username"];
-            if (!userViewInfo.userName) {
-                userViewInfo.userName = @"";
-            }
-            if ([postDic objectForKey:@"operateType"]) {
-                userViewInfo.operateType = [postDic objectForKey:@"operateType"];
-            }
-            else userViewInfo.operateType = @"";
                 
-            if ([postDic objectForKey:@"optParams"]) {
-                    userViewInfo.stayTime = [postDic objectForKey:@"optParams"];
+                NSData *data = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
+                //                data = [SAGzipUtility decompressData:data];
+                NSMutableArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+                if (!arr) {
+                    arr = [[NSMutableArray alloc] init];
                 }
-            else
-                userViewInfo.stayTime = @"";
-            if ([postDic objectForKey:@"objId"]) {
-                userViewInfo.objId = [postDic objectForKey:@"objId"];
-            }
-            else
-                userViewInfo.objId = @"";
+                [arr addObject:[self bindEventData:postDic]];
                 
-            userViewInfo.operateDate = [[SACommon shareInstance] getCurrentDate];
-            userViewInfo.productLine = [NSString stringWithFormat:@"%d",(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"productLine"]];
-            
-            NSDictionary *dic = [[NSBundle mainBundle] infoDictionary];
-            userViewInfo.appVersion = [NSString stringWithFormat:@"V%@",[dic objectForKey:@"CFBundleVersion"]];
-            userViewInfo.deviceModel = [[SACommon shareInstance] deviceString];
-            userViewInfo.appChannelId = [SACommon shareInstance].channelId;
-            NSData *data = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
-//            data = [SAGzipUtility decompressData:data];
-                
-            NSMutableArray* arr = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-            if (!arr) {
-                arr = [[NSMutableArray alloc] init];
-            }
-            NSDictionary *viewData = [NSDictionary dictionary];
-            viewData = [userViewInfo entityToDictionary:userViewInfo];
-            
-            [arr addObject:viewData];
-            if ([SAFileManeger writeToFile:arr toPath:[[SACommon shareInstance] getFilePath]]) {
-                NSLog(@"写入成功");
-            }else{
-                NSLog(@"写入失败");
-            }
+                if ([SAFileManeger writeToFile:arr toPath:[[SACommon shareInstance] getFilePath]]) {
+                    NSLog(@"写入成功");
+                }else{
+                    NSLog(@"写入失败");
+                }
         }
     }
 }
 
-
--(NSInteger)caculateTimesBetween:(NSDate*)date1 withDate:(NSDate*)date2
-{
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    unsigned int unitFlags = NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
-    NSDateComponents *d = [cal components:unitFlags fromDate:date1 toDate:date2 options:0];
-    NSInteger sec = [d hour]*3600+[d minute]*60+[d second];
-    return sec;
+/**
+ *  实时事件发送
+ *
+ *  @param postDic 数据集
+ */
+-(void)archiveQuickEvent:(NSDictionary*)postDic{
+    @synchronized(self)
+    {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_START"]) {
+            [[SANetWork sharedInstance] doGetWork:[self bindEventData:postDic]];
+        }
+    }
 }
+
 
 @end

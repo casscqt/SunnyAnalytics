@@ -37,6 +37,9 @@ typedef enum {
  */
 +(void)doEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams;
 
+
++(void)doQuickEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams;
+
 /**
  *  UIViewController 创建时调用
  *

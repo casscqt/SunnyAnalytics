@@ -26,7 +26,7 @@
     return netWork;
 }
 
--(void)doGetWork:(NSMutableDictionary *)dic  {
+-(void)doGetWork:(NSMutableDictionary *)dic{
     
 //    NSString *serverBatchUrl = [SERVER_PATH stringByAppendingString:@"collectBatch.do"];
     
@@ -37,9 +37,9 @@
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
 
     [manager GET:serverSingleUrl parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
-
+        [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
     } failure:^(NSURLSessionDataTask *task, NSError *error){
-
+        [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
     }];
 }
 
