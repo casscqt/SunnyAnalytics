@@ -67,7 +67,7 @@
     
     NSMutableDictionary *dicParams = [NSMutableDictionary dictionary];
     [dicParams setObject:strActions forKey:@"jsonParams"];
-    [[SANetWork sharedInstance] doGetWork:dicParams];
+    [[SANetWork sharedInstance] doGetWork:dicParams netType:ENUM_BATCH];
     
 }
 
@@ -210,7 +210,7 @@
     @synchronized(self)
     {
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_START"]) {
-            [[SANetWork sharedInstance] doGetWork:[self bindEventData:postDic]];
+            [[SANetWork sharedInstance] doGetWork:[self bindEventData:postDic] netType:ENUM_SINGLE];
         }
     }
 }

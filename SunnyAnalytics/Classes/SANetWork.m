@@ -26,17 +26,19 @@
     return netWork;
 }
 
--(void)doGetWork:(NSMutableDictionary *)dic{
-    
-//    NSString *serverBatchUrl = [SERVER_PATH stringByAppendingString:@"collectBatch.do"];
-    
-    NSString *serverSingleUrl = [SERVER_PATH stringByAppendingString:@"collect.do"];
+-(void)doGetWork:(NSMutableDictionary *)dic netType:(NetAction) action{
+    NSString *serverUrl;
+    if (action == ENUM_BATCH) {
+        serverUrl = [SERVER_PATH stringByAppendingString:@"collectBatch.do"];
+    }else{
+        serverUrl = [SERVER_PATH stringByAppendingString:@"collect.do"];
+    }
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     [manager.requestSerializer setTimeoutInterval:SERVER_OUT_INTERVAL];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
 
-    [manager GET:serverSingleUrl parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
+    [manager GET:serverUrl parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
         [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
     } failure:^(NSURLSessionDataTask *task, NSError *error){
         [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
