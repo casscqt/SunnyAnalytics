@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "SAAnalytics.h"
+#import "DCacheHelper.h"
 
 @interface AppDelegate ()
 
@@ -24,7 +25,10 @@
 
 #pragma mark - 上传统计信息策略
 -(void)pushAnalytics{
-    [SAAnalytics initSAAnalytics:@"" reportPolicy:SAEVERYDAY channelId:@"AppStore"];
+    [SAAnalytics initSAAnalytics:@"http://172.16.30.15:8080/actionDetail/" reportPolicy:SAEVERYDAY channelId:@"AppStore"];
+    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"firstStart"]) {
+        [SAAnalytics doEvent:app_init objectId:nil params:nil];
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -45,8 +49,16 @@
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
+/**
+ *  type=1,按启动时发送，type=2,按间隔发送, value值为时间间隔，秒为单位，type=3,退出时发送
+ *
+ *  @param application
+ */
 - (void)applicationWillTerminate:(UIApplication *)application {
-    // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    NSString *strEvent = [DCacheHelper getCacehObj].sEventStrategy;
+    if ([ strEvent isEqualToString:@"1,3"] || [strEvent isEqualToString:@"3"]) {
+        [[SAAnalytics shareInstance] postDataThread];
+    }
 }
 
 @end

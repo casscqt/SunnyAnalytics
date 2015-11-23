@@ -19,6 +19,22 @@
     return nil;
 }
 
++(NSDate *)createFileDate:(NSString *)filePath{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:filePath]) {
+        NSError *error = nil;
+        NSDictionary *fileAttributes = [fileManager attributesOfItemAtPath:filePath error:&error];
+        if (fileAttributes != nil) {
+//            NSNumber *fileSize = [fileAttributes objectForKey:NSFileSize];
+//            NSString *fileOwner = [fileAttributes objectForKey:NSFileOwnerAccountName];
+//            NSDate *fileModDate = [fileAttributes objectForKey:NSFileModificationDate];
+            NSDate *fileCreateDate = [fileAttributes objectForKey:NSFileCreationDate];
+            return fileCreateDate;
+        }
+    }
+    return nil;
+}
+
 + (BOOL)writeToFile:(NSArray*)arr toPath:(NSString*)toPath
 {
     NSData *data = [NSKeyedArchiver archivedDataWithRootObject:arr];

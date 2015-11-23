@@ -41,4 +41,14 @@
  */
 + (BOOL)deleteFile:(NSString*)path;
 
+
+/**
+ *  获取文件创建日期
+ *
+ *  @param filePath 文件路径
+ *
+ *  @return 日期String
+ */
++(NSDate *)createFileDate:(NSString *)filePath;
+
 @end

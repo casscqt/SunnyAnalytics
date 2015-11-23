@@ -9,8 +9,6 @@
 #import "ViewController.h"
 #import "SAAnalytics.h"
 
-
-#define sa_BtnClicked @"btn_click"
 #define sa_ClassicPage @"page_view_customerInterviewVideo"
 
 @interface ViewController ()
@@ -21,23 +19,72 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self initViews];
 }
 
--(void)initViews{
-    UIButton *buttonTest = [UIButton buttonWithType:UIButtonTypeCustom];
-    [buttonTest setTitle:@"事件统计" forState:UIControlStateNormal];
-    buttonTest.backgroundColor = [UIColor redColor];
-    buttonTest.frame = CGRectMake(self.view.center.x-100, self.view.center.y, 200, 30);
-    [buttonTest addTarget:self action:@selector(actionTest) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:buttonTest];
-}
 
 
 #pragma mark - 统计事件
--(void)actionTest{
-    [SAAnalytics doEvent:sa_BtnClicked objectId:nil params:nil];
+
+/**
+ *  订阅名师
+ *
+ *  @param sender <#sender description#>
+ */
+- (IBAction)subTeacher:(UIButton *)sender {
+    
+        [SAAnalytics doEvent:sub_teacher objectId:nil params:nil];
 }
+
+/**
+ *  购买视频
+ *
+ *  @param sender <#sender description#>
+ */
+- (IBAction)payVideo:(UIButton *)sender {
+    
+        [SAAnalytics doEvent:pay_video objectId:nil params:nil];
+}
+
+/**
+ *  象芽充值
+ *
+ *  @param sender <#sender description#>
+ */
+- (IBAction)xyChongzhi:(UIButton *)sender {
+    
+        [SAAnalytics doEvent:pay_user objectId:nil params:nil];
+}
+
+/**
+ *  订单支付
+ *
+ *  @param sender <#sender description#>
+ */
+- (IBAction)payOrder:(UIButton *)sender {
+        [SAAnalytics doEvent:pay_order objectId:nil params:nil];
+}
+
+
+/**
+ *  注册用户
+ *
+ *  @param sender <#sender description#>
+ */
+- (IBAction)registerUser:(UIButton *)sender {
+        [SAAnalytics doEvent:reg_user objectId:nil params:nil];
+}
+
+
+/**
+ *  实时事件
+ *
+ *  @param sender <#sender description#>
+ */
+- (IBAction)onTimeEvent:(UIButton *)sender {
+        [SAAnalytics doQuickEvent:@"onTimeEvent" objectId:nil params:nil];
+}
+
+
 
 #pragma mark - 统计页面
 -(void)viewWillAppear:(BOOL)animated

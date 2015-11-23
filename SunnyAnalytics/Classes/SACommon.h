@@ -66,4 +66,12 @@
  */
 -(NSInteger)caculateTimesBetween:(NSDate*)date1 withDate:(NSDate*)date2;
 
+
+/**
+ *  获取网络请求默认参数
+ *
+ *  @return 默认参数
+ */
+-(NSMutableDictionary *)getDefaultParams;
+
 @end

@@ -18,6 +18,13 @@ typedef NS_ENUM(NSInteger,NetAction) {
 
 + (SANetWork *)sharedInstance;
 
+
+/**
+ *  获取策略
+ */
+-(void)getStrategy;
+
+
 /**
  *  发送get网络请求
  *
@@ -25,6 +32,6 @@ typedef NS_ENUM(NSInteger,NetAction) {
  *  @param dic 参数
  *  @param action 请求类型
  */
--(void)doGetWork:(NSMutableDictionary *)dic netType:(NetAction) action;
+-(void)doAnalyticsWork:(NSMutableDictionary *)dic netType:(NetAction) action;
 
 @end

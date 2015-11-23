@@ -180,4 +180,25 @@
 }
 
 
+-(NSMutableDictionary *)getDefaultParams{
+    
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    [dic setValue:@"192.168.1.1" forKey:@"ip"];
+    [dic setValue:@"30" forKey:@"source"];
+    [dic setValue:@"1" forKey:@"sourceApp"];
+    [dic setValue:@"123456" forKey:@"deviceId"];
+    [dic setValue:@"中国" forKey:@"country"];
+    [dic setValue:@"北京市" forKey:@"province"];
+    [dic setValue:@"北京" forKey:@"city"];
+    [dic setValue:@"ios_sim" forKey:@"deviceName"];
+    [dic setValue:@"4" forKey:@"netType"];
+    NSDictionary *dicBundle = [[NSBundle mainBundle] infoDictionary];
+    [dic setValue:[NSString stringWithFormat:@"V%@",[dicBundle objectForKey:@"CFBundleShortVersionString"]] forKey:@"versionCode"];
+    [dic setValue:[[SACommon shareInstance] deviceString] forKey:@"sysVersion"];
+    [dic setValue:[SACommon shareInstance].channelId forKey:@"channel"];
+    
+    return dic;
+}
+
+
 @end

@@ -10,8 +10,7 @@
 #import "SAFileManeger.h"
 #import "AFNetworking.h"
 #import "SACommon.h"
-
-#define SERVER_PATH @"http://172.16.30.15:8080/actionDetail/"
+#import "DCacheHelper.h"
 
 #define SERVER_OUT_INTERVAL 10   //网络超时时间
 
@@ -26,23 +25,56 @@
     return netWork;
 }
 
--(void)doGetWork:(NSMutableDictionary *)dic netType:(NetAction) action{
+-(void)getStrategy{
+    
+    AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    [manager.requestSerializer setTimeoutInterval:SERVER_OUT_INTERVAL];
+    manager.responseSerializer = [AFJSONResponseSerializer serializer];
+    manager.requestSerializer = [AFHTTPRequestSerializer serializer];
+    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/json", @"text/javascript",@"application/json",@"text/html",@"text/plain", nil] ;
+    
+    [manager GET:[[SACommon shareInstance].baseUrl stringByAppendingString:@"getStrategy.do"] parameters:nil success:^(NSURLSessionDataTask *task, id responseObject){
+        //type=1,按启动时发送，type=2,按间隔发送, value值为时间间隔，秒为单位，type=3,退出时发送
+        NSString *strType =  [responseObject objectForKey:@"type"];
+        [DCacheHelper getCacehObj].sEventStrategy = strType;
+        if ([strType isEqualToString:@"2"]) {
+            [DCacheHelper getCacehObj].intervalTime =  [responseObject objectForKey:@"interval"];
+        }
+        [[DCacheHelper getCacehObj] save];
+        NSLog(@"%@",responseObject);
+    } failure:^(NSURLSessionDataTask *task, NSError *error){
+
+    }];
+    
+}
+
+-(void)doAnalyticsWork:(NSMutableDictionary *)dic netType:(NetAction) action{
     NSString *serverUrl;
     if (action == ENUM_BATCH) {
-        serverUrl = [SERVER_PATH stringByAppendingString:@"collectBatch.do"];
+        serverUrl = [[SACommon shareInstance].baseUrl stringByAppendingString:@"collectBatch.do"];
     }else{
-        serverUrl = [SERVER_PATH stringByAppendingString:@"collect.do"];
+        serverUrl = [[SACommon shareInstance].baseUrl stringByAppendingString:@"collect.do"];
     }
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     [manager.requestSerializer setTimeoutInterval:SERVER_OUT_INTERVAL];
     manager.responseSerializer = [AFJSONResponseSerializer serializer];
-
-    [manager GET:serverUrl parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
-        [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
-    } failure:^(NSURLSessionDataTask *task, NSError *error){
-        [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
-    }];
+    manager.responseSerializer.acceptableContentTypes = [NSSet setWithObjects:@"text/json", @"text/javascript",@"application/json",@"text/html",@"text/plain", nil] ;
+    
+    if (action == ENUM_BATCH) {
+        [manager POST:serverUrl parameters:dic success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+            [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
+        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            [SAFileManeger deleteFile:[[SACommon shareInstance] getFilePath]];
+        }];
+    }else{
+        [dic addEntriesFromDictionary:[[SACommon shareInstance] getDefaultParams]];
+        [manager GET:serverUrl parameters:dic success:^(NSURLSessionDataTask *task, id responseObject){
+            
+        } failure:^(NSURLSessionDataTask *task, NSError *error){
+            
+        }];
+    }
 }
 
 

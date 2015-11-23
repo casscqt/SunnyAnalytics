@@ -19,6 +19,7 @@
 		0E3AB60E1BDF6D1500B751A0 /* SAAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E3AB6001BDF6D1500B751A0 /* SAAnalytics.m */; };
 		0E3AB6101BDF6D1500B751A0 /* SAFileManeger.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E3AB6041BDF6D1500B751A0 /* SAFileManeger.m */; };
 		0E3AB6111BDF6D1500B751A0 /* SAGzipUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E3AB6061BDF6D1500B751A0 /* SAGzipUtility.m */; };
+		0E5288721C02F25C0074A109 /* DCacheHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5288711C02F25C0074A109 /* DCacheHelper.m */; };
 		0E5DD8791BFAD084007AD1FC /* SANetWork.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E5DD8781BFAD084007AD1FC /* SANetWork.m */; };
 		0E79E9511BFDAC1D00D4FF95 /* SAEventBean.m in Sources */ = {isa = PBXBuildFile; fileRef = 0E79E9501BFDAC1D00D4FF95 /* SAEventBean.m */; };
 		0EE4170D1BE20A60001069F4 /* SACommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 0EE4170C1BE20A60001069F4 /* SACommon.m */; };
@@ -66,6 +67,10 @@
 		0E3AB6041BDF6D1500B751A0 /* SAFileManeger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SAFileManeger.m; sourceTree = "<group>"; };
 		0E3AB6051BDF6D1500B751A0 /* SAGzipUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAGzipUtility.h; sourceTree = "<group>"; };
 		0E3AB6061BDF6D1500B751A0 /* SAGzipUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SAGzipUtility.m; sourceTree = "<group>"; };
+		0E5288701C02F25C0074A109 /* DCacheHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DCacheHelper.h; sourceTree = "<group>"; };
+		0E5288711C02F25C0074A109 /* DCacheHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DCacheHelper.m; sourceTree = "<group>"; };
+		0E5288731C02FD880074A109 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
+		0E5288741C02FDF00074A109 /* Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Header.h; sourceTree = "<group>"; };
 		0E5DD8771BFAD084007AD1FC /* SANetWork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SANetWork.h; sourceTree = "<group>"; };
 		0E5DD8781BFAD084007AD1FC /* SANetWork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SANetWork.m; sourceTree = "<group>"; };
 		0E79E94F1BFDAC1D00D4FF95 /* SAEventBean.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SAEventBean.h; sourceTree = "<group>"; };
@@ -130,6 +135,8 @@
 		0E2C403A1B625FB800384359 /* SunnyAnalytics */ = {
 			isa = PBXGroup;
 			children = (
+				0E5288701C02F25C0074A109 /* DCacheHelper.h */,
+				0E5288711C02F25C0074A109 /* DCacheHelper.m */,
 				0E3AB5FA1BDF6D1500B751A0 /* Classes */,
 				0E2C403E1B625FB800384359 /* AppDelegate.h */,
 				0E2C403F1B625FB800384359 /* AppDelegate.m */,
@@ -140,6 +147,8 @@
 				0E2C40491B625FB800384359 /* LaunchScreen.storyboard */,
 				0E2C404C1B625FB800384359 /* Info.plist */,
 				0E2C403B1B625FB800384359 /* Supporting Files */,
+				0E5288731C02FD880074A109 /* PrefixHeader.pch */,
+				0E5288741C02FDF00074A109 /* Header.h */,
 			);
 			path = SunnyAnalytics;
 			sourceTree = "<group>";
@@ -276,6 +285,7 @@
 				TargetAttributes = {
 					0E2C40371B625FB800384359 = {
 						CreatedOnToolsVersion = 7.0;
+						DevelopmentTeam = 822Q77CRW3;
 					};
 					0E2C40501B625FB800384359 = {
 						CreatedOnToolsVersion = 7.0;
@@ -390,6 +400,7 @@
 				0E79E9511BFDAC1D00D4FF95 /* SAEventBean.m in Sources */,
 				0E2C40431B625FB800384359 /* ViewController.m in Sources */,
 				0E2C40401B625FB800384359 /* AppDelegate.m in Sources */,
+				0E5288721C02F25C0074A109 /* DCacheHelper.m in Sources */,
 				0EE4170D1BE20A60001069F4 /* SACommon.m in Sources */,
 				0E3AB60E1BDF6D1500B751A0 /* SAAnalytics.m in Sources */,
 				0E3AB6101BDF6D1500B751A0 /* SAFileManeger.m in Sources */,
@@ -535,10 +546,15 @@
 			baseConfigurationReference = 365BCF2E9935AC717BC191F8 /* Pods-SunnyAnalytics.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_PREFIX_HEADER = "$(SRCROOT)/SunnyAnalytics/PrefixHeader.pch";
 				INFOPLIST_FILE = SunnyAnalytics/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SunnyAnalytics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -547,10 +563,15 @@
 			baseConfigurationReference = 52FA70517745D0A5829288E0 /* Pods-SunnyAnalytics.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_PREFIX_HEADER = "$(SRCROOT)/SunnyAnalytics/PrefixHeader.pch";
 				INFOPLIST_FILE = SunnyAnalytics/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.SunnyAnalytics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

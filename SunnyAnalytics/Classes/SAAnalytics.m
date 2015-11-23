@@ -11,9 +11,10 @@
 #import "SAGzipUtility.h"
 #import "SANetWork.h"
 #import "SACommon.h"
+#import "DCacheHelper.h"
+#import "MJExtension.h"
 
 @implementation SAAnalytics
-
 +(SAAnalytics*)shareInstance
 {
     static SAAnalytics *instance = nil;
@@ -24,10 +25,13 @@
 }
 
 +(void)initSAAnalytics:(NSString *)baseUrl  reportPolicy:(SAReportPolicy)reportPolicy channelId:(NSString *)channelId{
-    
-    [[SACommon shareInstance] setBaseUrl:baseUrl];
-    [[SACommon shareInstance] setChannelId:channelId];
-    [[SAAnalytics shareInstance] initWithReportPolicy:reportPolicy];
+    dispatch_queue_t _anQueue  = dispatch_queue_create("com.daydays.analytics", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(_anQueue, ^{
+        [[SACommon shareInstance] setBaseUrl:baseUrl];
+        [[SACommon shareInstance] setChannelId:channelId];
+        [[SANetWork sharedInstance] getStrategy];
+        [[SAAnalytics shareInstance] initWithReportPolicy:reportPolicy];
+    });
 }
 
 -(void)initWithReportPolicy:(SAReportPolicy)postPolicy{
@@ -50,7 +54,10 @@
                 [[NSUserDefaults standardUserDefaults] setObject:firstDate forKey:@"firstDate"];
                 [[NSUserDefaults standardUserDefaults]synchronize];
             }
-            [self postDataThread];
+            NSString *strEvent = [DCacheHelper getCacehObj].sEventStrategy;
+            if (strEvent != nil || [strEvent isEqualToString:@"1"]) {
+                [[SAAnalytics shareInstance] postDataThread];
+            }
         }
             break;
             
@@ -60,18 +67,30 @@
 }
 
 -(void)postDataThread{
-//    NSMutableDictionary *dic = [NSJSONSerialization JSONObjectWithData:arActions options:NSJSONReadingAllowFragments error:nil];
+
     NSData *dataArray = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
-    NSArray *arActions = [NSKeyedUnarchiver unarchiveObjectWithData:dataArray];
-    NSString *strActions = [arActions componentsJoinedByString:@" "];
-    
-    NSMutableDictionary *dicParams = [NSMutableDictionary dictionary];
-    [dicParams setObject:strActions forKey:@"jsonParams"];
-    [[SANetWork sharedInstance] doGetWork:dicParams netType:ENUM_BATCH];
-    
+    if (dataArray != nil&&[dataArray bytes] !=0) {
+        NSArray *arActions = [NSKeyedUnarchiver unarchiveObjectWithData:dataArray];
+        NSString *strActions = [arActions mj_JSONString];
+        
+
+        
+     NSString *strJSON =  [[[SACommon shareInstance] getDefaultParams] mj_JSONString];
+        strJSON = [strJSON stringByReplacingOccurrencesOfString:@"{" withString:@""];
+        strJSON = [strJSON stringByReplacingOccurrencesOfString:@"}" withString:@""];
+
+       NSString *firstPoint =  [@"{" stringByAppendingString:strJSON];
+        
+        NSString *stringssss =  [firstPoint stringByAppendingString:[@",\"params\":" stringByAppendingString: [strActions stringByAppendingString:@"}"]]];
+        
+        
+        NSMutableDictionary *dicParams2 = [NSMutableDictionary dictionary];
+        [dicParams2 setValue:stringssss forKey:@"jsonParams"];
+        [[SANetWork sharedInstance] doAnalyticsWork:dicParams2 netType:ENUM_BATCH];
+    }
 }
 
-+(void)doEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams
++(void)doEvent:(const NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams
 {
     NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
     
@@ -89,7 +108,7 @@
     [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveFileEvent:) withObject:dic];
 }
 
-+(void)doQuickEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams{
++(void)doQuickEvent:(const NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams{
     NSMutableDictionary *dic = [[NSMutableDictionary alloc] init];
     
     if (operateType) {
@@ -146,16 +165,17 @@
     }else{
         eventBean.uniqueCode = @"";
     }
-    eventBean.source = @"30";
-    eventBean.sourceApp = @"1";
-    eventBean.deviceId = @"123456";
-    eventBean.deviceName = @"ios_sim";
-    eventBean.netType = @"4";
     eventBean.realTime = [[SACommon shareInstance] getCurrentDate];
-    NSDictionary *dic = [[NSBundle mainBundle] infoDictionary];
-    eventBean.versionCode = [NSString stringWithFormat:@"V%@",[dic objectForKey:@"CFBundleShortVersionString"]];
-    eventBean.sysVersion = [[SACommon shareInstance] deviceString];
-    eventBean.channel = [SACommon shareInstance].channelId;
+    
+//    eventBean.source = @"30";
+//    eventBean.sourceApp = @"1";
+//    eventBean.deviceId = @"123456";
+//    eventBean.deviceName = @"ios_sim";
+//    eventBean.netType = @"4";
+//    NSDictionary *dic = [[NSBundle mainBundle] infoDictionary];
+//    eventBean.versionCode = [NSString stringWithFormat:@"V%@",[dic objectForKey:@"CFBundleShortVersionString"]];
+//    eventBean.sysVersion = [[SACommon shareInstance] deviceString];
+//    eventBean.channel = [SACommon shareInstance].channelId;
     
     
     if ([postDic objectForKey:@"optParams"]) {
@@ -194,6 +214,13 @@
                 
                 if ([SAFileManeger writeToFile:arr toPath:[[SACommon shareInstance] getFilePath]]) {
                     NSLog(@"写入成功");
+                    //如果是延迟发送，判断缓存文件的创建时间和当前时间
+                    if ([[DCacheHelper getCacehObj].sEventStrategy isEqualToString:@"2"]) {
+                       NSDate *fileDate =   [SAFileManeger createFileDate:[[SACommon shareInstance] getFilePath]];
+                        if ([[SACommon shareInstance] caculateTimesBetween:fileDate withDate:[NSDate date]] >= [[DCacheHelper getCacehObj].sEventStrategy integerValue]) {
+                            [self postDataThread];
+                        }
+                    }
                 }else{
                     NSLog(@"写入失败");
                 }
@@ -210,7 +237,7 @@
     @synchronized(self)
     {
         if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_START"]) {
-            [[SANetWork sharedInstance] doGetWork:[self bindEventData:postDic] netType:ENUM_SINGLE];
+            [[SANetWork sharedInstance] doAnalyticsWork:[self bindEventData:postDic] netType:ENUM_SINGLE];
         }
     }
 }

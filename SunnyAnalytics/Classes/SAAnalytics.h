@@ -17,7 +17,34 @@ typedef enum {
     SAEVERYDAY = 2,       //EveryDay send Policy
 } SAReportPolicy;
 
+@interface Params : NSObject
+@property (copy, nonatomic) NSString *name;
+@property (assign, nonatomic) double price;
+@end
+
+@interface EventParams : NSObject
+@property (copy, nonatomic) NSString *ip;
+@property (copy, nonatomic) NSString *source;
+@property (copy, nonatomic) NSString *sourceApp;
+@property (copy, nonatomic) NSString *deviceId;
+@property (copy, nonatomic) NSString *country;
+@property (copy, nonatomic) NSString *province;
+@property (copy, nonatomic) NSString *city;
+@property (copy, nonatomic) NSString *deviceName;
+@property (copy, nonatomic) NSString *netType;
+@property (copy, nonatomic) NSString *versionCode;
+@property (copy, nonatomic) NSString *sysVersion;
+@property (copy, nonatomic) NSString *channel;
+@property (strong, nonatomic) Params  *params;
+@end
+
 @interface SAAnalytics : NSObject
+
+
++(SAAnalytics*)shareInstance;
+
+-(void)postDataThread;
+
 
 /**
  *  初始化数据统计
@@ -35,10 +62,17 @@ typedef enum {
  *  @param objId       ID
  *  @param optParams   参数
  */
-+(void)doEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams;
++(void)doEvent:(const NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams;
 
 
-+(void)doQuickEvent:(NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams;
+/**
+ *  实时事件统计
+ *
+ *  @param operateType 名称
+ *  @param objId       ID
+ *  @param optParams   参数
+ */
++(void)doQuickEvent:(const NSString*)operateType objectId:(NSString*)objId params:(NSString*)optParams;
 
 /**
  *  UIViewController 创建时调用
