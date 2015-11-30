@@ -15,14 +15,12 @@ typedef NS_ENUM(NSInteger,NetAction) {
 
 @interface SANetWork : NSObject
 
-
 + (SANetWork *)sharedInstance;
-
 
 /**
  *  获取策略
  */
--(void)getStrategy;
+-(void)getStrategy:(void(^)(void))successBlock;
 
 
 /**

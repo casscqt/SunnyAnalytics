@@ -28,9 +28,9 @@
     dispatch_queue_t _anQueue  = dispatch_queue_create("com.daydays.analytics", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(_anQueue, ^{
         [[SACommon shareInstance] setBaseUrl:baseUrl];
-        [[SACommon shareInstance] setChannelId:channelId];
-        [[SANetWork sharedInstance] getStrategy];
-        [[SAAnalytics shareInstance] initWithReportPolicy:reportPolicy];
+        [[SANetWork sharedInstance] getStrategy:^{
+            [[SAAnalytics shareInstance] initWithReportPolicy:reportPolicy];
+        }];
     });
 }
 
@@ -55,34 +55,28 @@
                 [[NSUserDefaults standardUserDefaults]synchronize];
             }
             NSString *strEvent = [DCacheHelper getCacehObj].sEventStrategy;
-            if (strEvent != nil || [strEvent isEqualToString:@"1"]) {
+            if (strEvent != nil || [strEvent isEqualToString:@(SEND_START)]) {
                 [[SAAnalytics shareInstance] postDataThread];
             }
         }
             break;
-            
         default:
             break;
     }
 }
 
 -(void)postDataThread{
-
     NSData *dataArray = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
     if (dataArray != nil&&[dataArray bytes] !=0) {
         NSArray *arActions = [NSKeyedUnarchiver unarchiveObjectWithData:dataArray];
         NSString *strActions = [arActions mj_JSONString];
         
-
-        
-     NSString *strJSON =  [[[SACommon shareInstance] getDefaultParams] mj_JSONString];
+        NSString *strJSON =  [[[SACommon shareInstance] getDefaultParams] mj_JSONString];
         strJSON = [strJSON stringByReplacingOccurrencesOfString:@"{" withString:@""];
         strJSON = [strJSON stringByReplacingOccurrencesOfString:@"}" withString:@""];
 
-       NSString *firstPoint =  [@"{" stringByAppendingString:strJSON];
-        
+        NSString *firstPoint =  [@"{" stringByAppendingString:strJSON];
         NSString *stringssss =  [firstPoint stringByAppendingString:[@",\"params\":" stringByAppendingString: [strActions stringByAppendingString:@"}"]]];
-        
         
         NSMutableDictionary *dicParams2 = [NSMutableDictionary dictionary];
         [dicParams2 setValue:stringssss forKey:@"jsonParams"];
@@ -149,7 +143,7 @@
             [params setObject:page forKey:@"operateType"];
             [params setObject:stayTimeinteval forKey:@"optParams"];
             [[NSUserDefaults standardUserDefaults] setObject:page forKey:@"fromPage"];
-            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"FIRST_START"];
+            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"FIRST_ANALY_START"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:[NSString stringWithFormat:@"%@startDate",page]];
             [[SAAnalytics shareInstance] performSelectorInBackground:@selector(archiveFileEvent:) withObject:params];
@@ -166,17 +160,6 @@
         eventBean.uniqueCode = @"";
     }
     eventBean.realTime = [[SACommon shareInstance] getCurrentDate];
-    
-//    eventBean.source = @"30";
-//    eventBean.sourceApp = @"1";
-//    eventBean.deviceId = @"123456";
-//    eventBean.deviceName = @"ios_sim";
-//    eventBean.netType = @"4";
-//    NSDictionary *dic = [[NSBundle mainBundle] infoDictionary];
-//    eventBean.versionCode = [NSString stringWithFormat:@"V%@",[dic objectForKey:@"CFBundleShortVersionString"]];
-//    eventBean.sysVersion = [[SACommon shareInstance] deviceString];
-//    eventBean.channel = [SACommon shareInstance].channelId;
-    
     
     if ([postDic objectForKey:@"optParams"]) {
         eventBean.stayTime = [postDic objectForKey:@"optParams"];
@@ -202,7 +185,7 @@
 -(void)archiveFileEvent:(NSDictionary*)postDic{
     @synchronized(self)
     {
-            if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_START"]) {
+            if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_ANALY_START"]) {
                 
                 NSData *data = [SAFileManeger readFile:[[SACommon shareInstance] getFilePath ]];
                 //                data = [SAGzipUtility decompressData:data];
@@ -215,7 +198,7 @@
                 if ([SAFileManeger writeToFile:arr toPath:[[SACommon shareInstance] getFilePath]]) {
                     NSLog(@"写入成功");
                     //如果是延迟发送，判断缓存文件的创建时间和当前时间
-                    if ([[DCacheHelper getCacehObj].sEventStrategy isEqualToString:@"2"]) {
+                    if ([[DCacheHelper getCacehObj].sEventStrategy isEqualToString:@(SEND_TIME)]) {
                        NSDate *fileDate =   [SAFileManeger createFileDate:[[SACommon shareInstance] getFilePath]];
                         if ([[SACommon shareInstance] caculateTimesBetween:fileDate withDate:[NSDate date]] >= [[DCacheHelper getCacehObj].sEventStrategy integerValue]) {
                             [self postDataThread];
@@ -236,10 +219,14 @@
 -(void)archiveQuickEvent:(NSDictionary*)postDic{
     @synchronized(self)
     {
-        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_START"]) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"FIRST_ANALY_START"]) {
             [[SANetWork sharedInstance] doAnalyticsWork:[self bindEventData:postDic] netType:ENUM_SINGLE];
         }
     }
+}
+
++ (void)setPublicParamBlock:(PublicParamBlock)block{
+        [[SACommon shareInstance] setPublickParamBlock:block];
 }
 
 

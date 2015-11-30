@@ -11,11 +11,11 @@
 /**
  发送策略
  */
-typedef enum {
+typedef NS_ENUM(NSInteger,SAReportPolicy) {
     SABATCH = 0,          //Send Data When Start
     SAREALTIME = 1,       //RealTime Send Policy
     SAEVERYDAY = 2,       //EveryDay send Policy
-} SAReportPolicy;
+};
 
 @interface Params : NSObject
 @property (copy, nonatomic) NSString *name;
@@ -38,12 +38,26 @@ typedef enum {
 @property (strong, nonatomic) Params  *params;
 @end
 
+
+/**
+ *  数据流适配类，网络层与业务层的衔接，能实现面向模型最重要的类，主要做数据的解析与对接。
+ */
+typedef NSDictionary *(^PublicParamBlock)();
+
 @interface SAAnalytics : NSObject
 
 
 +(SAAnalytics*)shareInstance;
 
 -(void)postDataThread;
+
+
+/**
+ *  添加公共参数
+ *
+ *  @param block
+ */
++ (void)setPublicParamBlock:(PublicParamBlock)block;
 
 
 /**

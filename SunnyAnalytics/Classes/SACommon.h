@@ -8,6 +8,16 @@
 
 #import <Foundation/Foundation.h>
 
+
+typedef NSDictionary *(^PublicParamBlock)();
+
+typedef NS_ENUM(NSInteger,SendPolicy) {
+    SEND_START = 1, //启动时发送
+    SEND_TIME,       //按间隔发送, value值为时间间隔，秒为单位
+    SEND_EXIT,       //退出时发送
+};
+
+
 /**
  *  工具类
  */
@@ -22,11 +32,12 @@
 @property(nonatomic,strong)NSString *baseUrl;
 
 /**
- *  渠道号
+ *  获取公共请求参数的block，如果你想实现动态更新的公共参数，请使用此属性
  */
-@property(nonatomic,strong)NSString *channelId;
+@property (nonatomic, copy) PublicParamBlock publickParamBlock;
 
 +(SACommon*)shareInstance;
+
 
 /**
  *  获取设备名称

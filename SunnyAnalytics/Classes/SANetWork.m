@@ -25,7 +25,7 @@
     return netWork;
 }
 
--(void)getStrategy{
+-(void)getStrategy:(void(^)(void))successBlock{
     
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
     [manager.requestSerializer setTimeoutInterval:SERVER_OUT_INTERVAL];
@@ -37,10 +37,13 @@
         //type=1,按启动时发送，type=2,按间隔发送, value值为时间间隔，秒为单位，type=3,退出时发送
         NSString *strType =  [responseObject objectForKey:@"type"];
         [DCacheHelper getCacehObj].sEventStrategy = strType;
-        if ([strType isEqualToString:@"2"]) {
+        if ([strType isEqualToString:@(SEND_TIME)]) {
             [DCacheHelper getCacehObj].intervalTime =  [responseObject objectForKey:@"interval"];
         }
         [[DCacheHelper getCacehObj] save];
+        if (successBlock) {
+            successBlock();
+        }
         NSLog(@"%@",responseObject);
     } failure:^(NSURLSessionDataTask *task, NSError *error){
 

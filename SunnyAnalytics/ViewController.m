@@ -81,7 +81,7 @@
  *  @param sender <#sender description#>
  */
 - (IBAction)onTimeEvent:(UIButton *)sender {
-        [SAAnalytics doQuickEvent:@"onTimeEvent" objectId:nil params:nil];
+        [SAAnalytics doQuickEvent:pay_order objectId:nil params:nil];
 }
 
 
@@ -89,14 +89,14 @@
 #pragma mark - 统计页面
 -(void)viewWillAppear:(BOOL)animated
 {
-    [SAAnalytics beginPage:sa_ClassicPage];
+//    [SAAnalytics beginPage:sa_ClassicPage];
     [super viewWillAppear:animated];
 }
 
 #pragma mark - 统计页面
 -(void)viewWillDisappear:(BOOL)animated
 {
-    [SAAnalytics endPage:sa_ClassicPage];
+//    [SAAnalytics endPage:sa_ClassicPage];
     [super viewWillDisappear:YES];
     
 }
